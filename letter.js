@@ -19,8 +19,19 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing text parameter' });
     }
 
-    // 解码文本
+    // HTML 转义函数
+    const escapeHtml = (unsafe) => {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    };
+
+    // 解码并转义文本
     const decodedText = decodeURIComponent(text);
+    const safeText = escapeHtml(decodedText).replace(/\n/g, '<br>');
     
     // 创建HTML内容
     const htmlContent = `
@@ -28,6 +39,8 @@ export default async function handler(req, res) {
 <html>
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>手写信件</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
         
@@ -36,6 +49,7 @@ export default async function handler(req, res) {
             padding: 80px 60px;
             background-image: url('https://pixelarray-picturebed.oss-cn-beijing.aliyuncs.com/picturebed/152/e6b84e973e0d054f14fca4b760742d93.jpg');
             background-size: cover;
+            background-attachment: fixed;
             font-family: 'Ma Shan Zheng', cursive;
             font-size: 24px;
             line-height: 1.8;
@@ -56,17 +70,30 @@ export default async function handler(req, res) {
             white-space: pre-wrap;
             word-break: break-word;
         }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            body {
+                padding: 40px 20px;
+                font-size: 20px;
+            }
+            
+            .letter-container {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="letter-container">
-        <div class="letter-content">${decodedText.replace(/\n/g, '<br>')}</div>
+        <div class="letter-content">${safeText}</div>
     </div>
 </body>
 </html>
     `;
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
     res.status(200).send(htmlContent);
     
   } catch (error) {
