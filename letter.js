@@ -1,26 +1,26 @@
-export default async function handler(req, res) {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+导出默认异步函数处理程序(req，res) {
+//设置CORS标头
+RES . set header(设置 接近，' * ')；
+RES . set header(设置 接近，得到 选择)；
+RES . set header(设置 接近，内容 类型)；
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+如果 (req.method === '请求) {
+返回资源状态(200)。end()；
   }
 
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
+如果 (req.method！== '请求) {
+返回结果状态(405)。json({错误:“不允许方法”})；
   }
 
-  try {
-    const { text } = req.query;
+尝试{
+常数 { 文本 } = 请求.询问
     
-    if (!text) {
-      return res.status(400).json({ error: 'Missing text parameter' });
+    如果(！文本){
+    返回资源状态(400)。json({错误:“缺少文本参数”})；
     }
 
     // Decode text
-    const decodedText = decodeURIComponent(text);
+    常数 解码文本 = decodeURIComponent组件(文本);
     
     // Create HTML content
     const htmlContent = `
