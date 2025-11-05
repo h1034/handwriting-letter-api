@@ -1,46 +1,37 @@
 export default async function handler(req, res) {
-  // 设置CORS头
+  // 设置CORS头，允许前端调用
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+  // 处理OPTIONS预检请求
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
+  // 仅允许GET请求
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
+    return res.status(405).json({ error: '只支持GET请求' });
   }
 
   try {
     const { text } = req.query;
     
+    // 检查参数
     if (!text) {
-      return res.status(400).json({ error: 'Missing text parameter' });
+      return res.status(400).json({ error: '缺少text参数' });
     }
 
-    // HTML 转义函数
-    const escapeHtml = (unsafe) => {
-      return unsafe
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    };
-
-    // 解码并转义文本
+    // 解码文本并处理换行
     const decodedText = decodeURIComponent(text);
-    const safeText = escapeHtml(decodedText).replace(/\n/g, '<br>');
-    
-    // 创建HTML内容
+    const formattedText = decodedText.replace(/\n/g, '<br>');
+
+    // 创建复古信纸风格的HTML
     const htmlContent = `
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>手写信件</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap');
         
@@ -49,7 +40,6 @@ export default async function handler(req, res) {
             padding: 80px 60px;
             background-image: url('https://pixelarray-picturebed.oss-cn-beijing.aliyuncs.com/picturebed/152/e6b84e973e0d054f14fca4b760742d93.jpg');
             background-size: cover;
-            background-attachment: fixed;
             font-family: 'Ma Shan Zheng', cursive;
             font-size: 24px;
             line-height: 1.8;
@@ -70,34 +60,21 @@ export default async function handler(req, res) {
             white-space: pre-wrap;
             word-break: break-word;
         }
-
-        /* 移动端适配 */
-        @media (max-width: 768px) {
-            body {
-                padding: 40px 20px;
-                font-size: 20px;
-            }
-            
-            .letter-container {
-                padding: 20px;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="letter-container">
-        <div class="letter-content">${safeText}</div>
+        <div class="letter-content">${formattedText}</div>
     </div>
 </body>
 </html>
     `;
 
+    // 返回HTML响应
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('X-Content-Type-Options', 'nosniff');
     res.status(200).send(htmlContent);
     
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Server Error: ' + error.message });
+    res.status(500).json({ error: '服务器错误: ' + error.message });
   }
 }
