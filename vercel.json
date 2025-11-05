@@ -1,15 +1,15 @@
 {
-  "version": 2,
-  "functions": {
-    "api/letter.js": {
-      "maxDuration": 10
-    }
-  },
-  "routes": [
-    {
-      "src": "/api/letter",
-      "methods": ["GET"],
-      "dest": "/api/letter.js"
-    }
-  ]
+    "version": 2,
+    "functions": {
+        "api/letter.js": {
+            "maxDuration": 10
+        }
+    },
+    "routes": [
+        {
+            "src": "/api/letter",
+            "methods": ["GET"],
+            "dest": "/api/letter.js"
+        }
+    ]
 }
